@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"],
+    "paths": {
+      "@utils/*": ["./utils/*"],
+      "@config/*": ["./config/*"]
+    },
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "*.ts",
+    "tests/**/*.ts",
+    "automation/**/*.ts",
+    "utils/**/*.ts",
+    "config/**/*.json"
+  ],
+  "exclude": ["node_modules"]
+}

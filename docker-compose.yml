@@ -1,0 +1,22 @@
+services:
+  tests:
+    build: .
+    container_name: lizma-tests
+    working_dir: /app
+    shm_size: '512mb'
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    volumes:
+      - ./tests:/app/tests
+      - ./pages:/app/pages
+      - ./utils:/app/utils
+      - ./automation:/app/automation
+      - ./config:/app/config
+      - ./playwright.config.ts:/app/playwright.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./.env:/app/.env
+      - ./test-results:/app/test-results
+    environment:
+      - CI=false
