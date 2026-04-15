@@ -3,12 +3,15 @@
 # ─── Uso ──────────────────────────────────────────────────────────────────────
 # ./run-test.sh                → corre todos los tests
 # ./run-test.sh @Login         → corre solo tests con tag @Login
+# ./run-test.sh --headed       → corre con navegador visible
+# ./run-test.sh --headed @Login→ navegador visible + tag
 # ./run-test.sh --docker       → corre todos los tests en Docker
 # ./run-test.sh --docker @Login→ corre tag @Login en Docker
 # ./run-test.sh --build        → construye/reconstruye la imagen Docker
 
 # ─── Parsear argumentos ──────────────────────────────────────────────────────
 DOCKER=false
+HEADED=false
 TAG=""
 
 for arg in "$@"; do
@@ -21,6 +24,9 @@ for arg in "$@"; do
         --docker)
             DOCKER=true
             ;;
+        --headed)
+            HEADED=true
+            ;;
         *)
             TAG="$arg"
             ;;
@@ -31,6 +37,7 @@ done
 export EJECUCION_ID="Ejecucion_$(date +%d-%b_%I-%M-%p)"
 
 MODO=$($DOCKER && echo "Docker" || echo "Local")
+$HEADED && MODO="$MODO | Headed"
 
 echo "--------------------------------------------------------"
 echo "🎭 PLAYWRIGHT RUNNER"
@@ -39,19 +46,16 @@ echo "🌐 Browser: Chromium | $MODO"
 [ -n "$TAG" ] && echo "🏷️  Tag: $TAG"
 echo "--------------------------------------------------------"
 
+# ─── Construir comando ────────────────────────────────────────────────────────
+CMD="npx playwright test --project=Mobile-Chromium"
+[ -n "$TAG" ]   && CMD="$CMD --grep \"$TAG\""
+$HEADED         && CMD="$CMD --headed"
+
 # ─── Ejecutar tests ───────────────────────────────────────────────────────────
 if $DOCKER; then
-    if [ -n "$TAG" ]; then
-        docker compose run --rm tests npx playwright test --project=Mobile-Chromium --grep "$TAG"
-    else
-        docker compose run --rm tests npx playwright test --project=Mobile-Chromium
-    fi
+    docker compose run --rm tests $CMD
 else
-    if [ -n "$TAG" ]; then
-        npx playwright test --project=Mobile-Chromium --grep "$TAG"
-    else
-        npx playwright test --project=Mobile-Chromium
-    fi
+    eval $CMD
 fi
 
 STATUS=$?
